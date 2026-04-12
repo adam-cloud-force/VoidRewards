@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoidRewards</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RBXMagic Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #f5c518;
-    --gold-dim: #9a7d10;
-    --gold-glow: rgba(245,197,24,0.18);
-    --red: #c0392b;
-    --bg: #080808;
-    --surface: #101010;
-    --surface2: #181818;
-    --border: #222;
-    --border-gold: #3a3010;
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #161616;
+    --border: #222222;
+    --border-gold: rgba(245,197,24,0.18);
     --text: #e8e8e0;
+    --gold: #f5c518;
+    --gold-dim: rgba(245,197,24,0.35);
+    --red: #c0392b;
     --muted: #484840;
   }
 
@@ -292,31 +292,34 @@
 
 <div class="wrap">
 
+  <!-- HEADER -->
   <header class="hdr">
-    <div class="hdr-eyebrow">Live Competition</div>
+    <div class="hdr-eyebrow">RBXMagic &bull; Official Leaderboard</div>
     <h1 class="hdr-title">
-      <span class="prize">$750</span> CODE<br>
-      <span class="code" id="affiliateCode">VOIDDD</span> LEADERBOARD
+      <span class="prize">$500</span><br>
+      <span class="code">PRIZE POOL</span>
     </h1>
     <p class="hdr-sub">
-      Every bet on DiceBlox under code <em id="codeInline">VOIDDD</em> counts toward your score
-      <br>Leaderboard updates every 15 minutes
+      Use code <em>voidd</em> &mdash; Wager to climb the ranks &amp; claim your share<br>
+      March 23 &ndash; March 30, 2026
     </p>
   </header>
 
+  <!-- COUNTDOWN TIMER -->
   <div class="timer-wrap">
-    <div class="timer-eyebrow">Ending In</div>
+    <div class="timer-eyebrow">Time Remaining</div>
     <div class="timer-digits">
-      <div class="tunit"><span class="tnum" id="tDays">00</span><div class="tlabel">Days</div></div>
-      <span class="tsep">:</span>
-      <div class="tunit"><span class="tnum" id="tHours">00</span><div class="tlabel">Hours</div></div>
-      <span class="tsep">:</span>
-      <div class="tunit"><span class="tnum" id="tMins">00</span><div class="tlabel">Mins</div></div>
-      <span class="tsep">:</span>
-      <div class="tunit"><span class="tnum" id="tSecs">00</span><div class="tlabel">Secs</div></div>
+      <div class="tunit"><span class="tnum" id="t-d">00</span><div class="tlabel">Days</div></div>
+      <div class="tsep">:</div>
+      <div class="tunit"><span class="tnum" id="t-h">00</span><div class="tlabel">Hours</div></div>
+      <div class="tsep">:</div>
+      <div class="tunit"><span class="tnum" id="t-m">00</span><div class="tlabel">Mins</div></div>
+      <div class="tsep">:</div>
+      <div class="tunit"><span class="tnum" id="t-s">00</span><div class="tlabel">Secs</div></div>
     </div>
   </div>
 
+  <!-- DYNAMIC CONTENT -->
   <div id="content">
     <div class="state-msg">
       <div class="spinner"></div>
@@ -324,163 +327,175 @@
     </div>
   </div>
 
+  <!-- SPONSOR FOOTER -->
   <div class="sponsor">
     <div class="sponsor-copy">
-      <strong>How to enter &rarr;</strong><br>
-      Sign up on DiceBlox &middot; Use code <strong id="codeBar">VOIDDD</strong> &middot; Every bet counts toward your ranking
+      Play on <strong>RBXMagic</strong><br>
+      Use code <strong>voidd</strong> for a bonus on signup
     </div>
-    <a href="https://diceblox.com" target="_blank" class="cta">&#9654; PLAY NOW</a>
+    <a class="cta" href="https://www.rbxmagic.com/r/voidd" target="_blank" rel="noopener">
+      PLAY NOW
+    </a>
   </div>
 
-  <div class="last-updated">Last updated: <span id="lastUpdated">&mdash;</span></div>
+  <div class="last-updated">Last updated: <span id="lu-time">—</span></div>
 
-</div>
+</div><!-- /wrap -->
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────
-const WORKER_URL = 'https://lively-math-1c4f.adam-12127713.workers.dev';
-const CACHE_TTL = 15 * 60 * 1000; // 15 min — respect rate limit
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const WORKER_URL  = 'https://fragrant-snowflake-66c0.adamthesigma.workers.dev';
+const CACHE_KEY   = 'rbxmagic_lb_cache';
+const CACHE_TTL   = 15 * 60 * 1000; // 15 min
 
-// Set your leaderboard end date here
-const END_DATE = new Date('2026-03-30T00:00:00');
+// Leaderboard window
+const END_DATE  = new Date('2026-03-30T00:00:00');
+const FROM_DATE = new Date('2026-03-23T00:00:00');
 
 // Prize pool for positions 1–10
-const PRIZES = ['$300','$150','$100','$60','$40','$25','$25','$20','$15','$15'];
-const AVATARS = ['👑','🥈','🥉','🎯','🃏','💎','🎰','🔥','⚡','🎭'];
+const PRIZES = ['$200','$100','$75','$40','$25','$20','$15','$10','$10','$5'];
 
-// ── TIMER ────────────────────────────────────────────────────────────────
-function tick() {
-  const diff = Math.max(0, END_DATE - Date.now());
-  const pad = n => String(Math.floor(n)).padStart(2,'0');
-  document.getElementById('tDays').textContent  = pad(diff / 86400000);
-  document.getElementById('tHours').textContent = pad((diff % 86400000) / 3600000);
-  document.getElementById('tMins').textContent  = pad((diff % 3600000) / 60000);
-  const s = document.getElementById('tSecs');
-  s.textContent = pad((diff % 60000) / 1000);
-  s.classList.add('flash');
-  setTimeout(() => s.classList.remove('flash'), 120);
-}
-tick(); setInterval(tick, 1000);
+// Emoji avatars (deterministic by username length mod)
+const AVATARS = ['🎮','🎯','💎','🔥','⚡','👑','🏆','🌟','💫','🎲'];
 
-// ── CACHE ────────────────────────────────────────────────────────────────
-function getCached() {
+// ─── COUNTDOWN ───────────────────────────────────────────────────────────────
+(function ticker(){
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function update(){
+    const diff = END_DATE - Date.now();
+    if(diff <= 0){
+      ['t-d','t-h','t-m','t-s'].forEach(id=>{ document.getElementById(id).textContent='00'; });
+      return;
+    }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('t-d').textContent = pad(d);
+    document.getElementById('t-h').textContent = pad(h);
+    document.getElementById('t-m').textContent = pad(m);
+    const sEl = document.getElementById('t-s');
+    sEl.textContent = pad(s);
+    sEl.classList.add('flash');
+    setTimeout(()=>sEl.classList.remove('flash'), 100);
+  }
+  update();
+  setInterval(update, 1000);
+})();
+
+// ─── CACHE ───────────────────────────────────────────────────────────────────
+function getCached(){
   try {
-    const raw = sessionStorage.getItem('lb_v1');
-    if (!raw) return null;
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
     const {ts, data} = JSON.parse(raw);
-    return (Date.now() - ts < CACHE_TTL) ? data : null;
-  } catch(e) { return null; }
+    if(Date.now() - ts > CACHE_TTL) return null;
+    return data;
+  } catch(e){ return null; }
 }
-function setCache(data) {
-  try { sessionStorage.setItem('lb_v1', JSON.stringify({ts: Date.now(), data})); } catch(e) {}
+function setCache(data){
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), data})); } catch(e){}
 }
 
-// ── HELPERS ──────────────────────────────────────────────────────────────
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function fmt(n){
+  if(n == null) return '—';
+  return Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
 
-// ── RENDER ───────────────────────────────────────────────────────────────
-function render(raw) {
-  // Normalise to flat array
-  let list = Array.isArray(raw) ? raw
-           : raw.data        ? raw.data
-           : raw.users       ? raw.users
-           : raw.leaderboard ? raw.leaderboard
-           : raw.entries     ? raw.entries
-           : null;
+function avatarFor(name){
+  return AVATARS[(name||'').length % AVATARS.length];
+}
 
-  if (!list || !list.length) {
-    showError('No leaderboard data available yet — check back soon!');
-    return;
-  }
+function render(entries){
+  const top3  = entries.slice(0,3);
+  const rest  = entries.slice(3);
+  const now   = new Date();
+  const luEl  = document.getElementById('lu-time');
+  if(luEl) luEl.textContent = now.toLocaleTimeString();
 
-  // Sort by wagered descending, take top 10
-  list = list
-    .map(p => ({
-      username: p.username || p.name || p.user || 'Anonymous',
-      wagered:  parseFloat(p.wagered || p.wager || p.amount || 0)
-    }))
-    .sort((a,b) => b.wagered - a.wagered)
-    .slice(0,10);
+  let html = '';
 
-  // Update code display if API returns it
-  if (raw.code || raw.affiliateCode) {
-    const c = raw.code || raw.affiliateCode;
-    ['affiliateCode','codeInline','codeBar'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = c;
+  // PODIUM
+  if(top3.length){
+    html += '<div class="podium">';
+    const order = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+    const classes = top3.length >= 3 ? ['p2','p1','p3'] : ['p1','p2','p3'];
+    const ranks   = top3.length >= 3 ? ['2nd Place','1st Place','3rd Place'] : ['1st Place','2nd Place','3rd Place'];
+    order.forEach((entry, i)=>{
+      if(!entry) return;
+      const cls   = classes[i];
+      const rank  = ranks[i];
+      const orig  = top3.indexOf(entry);
+      const prize = PRIZES[orig] || '—';
+      html += `
+        <div class="pod-card ${cls}">
+          <div class="pod-rank">${rank}</div>
+          <div class="pod-avatar">${avatarFor(entry.username)}</div>
+          <div class="pod-name">${entry.username}</div>
+          <div class="pod-wlabel">Total Wagered</div>
+          <div class="pod-wval">${fmt(entry.wagered)}</div>
+          <div class="pod-prize">${prize}</div>
+        </div>`;
     });
+    html += '</div>';
   }
 
-  // Podium (top 3)
-  const [first, second, third] = list;
-  const podium = `
-    <div class="podium">
-      ${podCard(second, 1, 'p2')}
-      ${podCard(first,  0, 'p1')}
-      ${podCard(third,  2, 'p3')}
-    </div>`;
+  // TABLE (4–10)
+  if(rest.length){
+    html += `
+      <div class="lb-wrap">
+        <div class="section-divider">
+          <div class="line"></div>
+          <div class="label">Rankings 4 – 10</div>
+          <div class="line"></div>
+        </div>
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Prize</th>
+              <th>Wagered</th>
+            </tr>
+          </thead>
+          <tbody>`;
+    rest.forEach((entry, i)=>{
+      const pos   = i + 4;
+      const prize = PRIZES[pos-1] || '—';
+      const accent = pos===4?'accent-gold': pos===5?'accent-silver': pos===6?'accent-bronze':'';
+      html += `
+            <tr class="${accent}">
+              <td class="place-cell">#${pos}</td>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar">${avatarFor(entry.username)}</div>
+                  <span class="username">${entry.username}</span>
+                </div>
+              </td>
+              <td class="reward-cell">${prize}</td>
+              <td class="wagered-cell">${fmt(entry.wagered)}</td>
+            </tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
 
-  // Table (4–10)
-  const accents = ['accent-gold','accent-silver','accent-bronze'];
-  const rows = list.slice(3).map((p,i) => {
-    const rank = i + 4;
-    return `
-      <tr class="${accents[i]||''}">
-        <td class="place-cell">#${rank}</td>
-        <td><div class="user-cell">
-          <div class="user-avatar">${AVATARS[rank-1]||'🎲'}</div>
-          <div class="username">${esc(p.username)}</div>
-        </div></td>
-        <td class="reward-cell">${PRIZES[rank-1]||'—'}</td>
-        <td class="wagered-cell">${fmt(p.wagered)}</td>
-      </tr>`;
-  }).join('');
+  if(!html){
+    html = '<div class="state-msg">NO DATA AVAILABLE YET — CHECK BACK SOON</div>';
+  }
 
-  const table = `
-    <div class="lb-wrap">
-      <div class="section-divider">
-        <div class="line"></div>
-        <div class="label">Full Rankings</div>
-        <div class="line"></div>
-      </div>
-      <table class="lb-table">
-        <thead><tr>
-          <th>Place</th><th>User</th>
-          <th style="text-align:right">Reward</th>
-          <th style="text-align:right">Wagered</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-
-  document.getElementById('content').innerHTML = podium + table;
-  document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+  document.getElementById('content').innerHTML = html;
 }
 
-function podCard(p, rankIdx, cls) {
-  if (!p) return '';
-  const labels = ['&#128081; 1ST PLACE','&#129352; 2ND PLACE','&#129353; 3RD PLACE'];
-  return `
-    <div class="pod-card ${cls}">
-      <div class="pod-rank">${labels[rankIdx]}</div>
-      <div class="pod-avatar">${AVATARS[rankIdx]}</div>
-      <div class="pod-name">${esc(p.username)}</div>
-      <div class="pod-wlabel">Wagered</div>
-      <div class="pod-wval">${fmt(p.wagered)}</div>
-      <div class="pod-prize">${PRIZES[rankIdx]}</div>
-    </div>`;
-}
-
-function showError(msg) {
+function showError(msg){
   document.getElementById('content').innerHTML =
-    `<div class="state-msg error">${esc(msg)}</div>`;
+    `<div class="state-msg error">⚠ ${msg}</div>`;
 }
 
-// ── FETCH ────────────────────────────────────────────────────────────────
-async function load() {
+// ─── FETCH ────────────────────────────────────────────────────────────────────
+async function load(){
   const cached = getCached();
-  if (cached) { render(cached); return; }
+  if(cached){ render(cached); return; }
 
   // Fixed date range: March 23 to March 30
   const from = new Date('2026-03-23T00:00:00');
@@ -488,17 +503,19 @@ async function load() {
   const url = WORKER_URL + '?date=' + encodeURIComponent(from.toISOString());
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) { showError(`API returned ${res.status} — ${res.statusText}`); return; }
+    const res  = await fetch(url);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    setCache(json);
-    render(json);
-  } catch(e) {
-    showError(`Could not reach the API: ${e.message}`);
+    const entries = Array.isArray(json) ? json : (json.data || json.leaderboard || []);
+    setCache(entries);
+    render(entries);
+  } catch(err){
+    showError('FAILED TO LOAD DATA — ' + err.message);
   }
 }
 
 load();
 </script>
+
 </body>
 </html>
