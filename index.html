@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -352,8 +352,17 @@ const CACHE_TTL   = 15 * 60 * 1000; // 15 min
 const END_DATE  = new Date('2026-04-20T00:00:00');
 const FROM_DATE = new Date('2026-04-13T00:00:00');
 
-// Prize pool for positions 1–10
-const PRIZES = ['$200','$100','$75','$40','$25','$20','$15','$10','$10','$5'];
+// Prize pool for positions 1-5
+const PRIZES = ['$200','$100','$75','$40','$25'];
+
+// Manual leaderboard data (sorted by wagered desc)
+const MANUAL_DATA = [
+  { username: 'yblamaaaaa', wagered: 296664 },
+  { username: 'GAMBLING',   wagered: 10691  },
+  { username: 'alexk',      wagered: 9730   },
+  { username: 'LouGambles', wagered: 5241   },
+  { username: 'rbxtimmy',   wagered: 2151   },
+];
 
 // Emoji avatars (deterministic by username length mod)
 const AVATARS = ['🎮','🎯','💎','🔥','⚡','👑','🏆','🌟','💫','🎲'];
@@ -447,7 +456,7 @@ function render(entries){
       <div class="lb-wrap">
         <div class="section-divider">
           <div class="line"></div>
-          <div class="label">Rankings 4 – 10</div>
+          <div class="label">Rankings 4 – 5</div>
           <div class="line"></div>
         </div>
         <table class="lb-table">
@@ -493,27 +502,11 @@ function showError(msg){
 }
 
 // ─── FETCH ────────────────────────────────────────────────────────────────────
-async function load(){
-  const cached = getCached();
-  if(cached){ render(cached); return; }
-
-  // Fixed date range: March 23 to March 30
-  const from = new Date('2026-03-23T00:00:00');
-  from.setHours(0,0,0,0);
-  const url = WORKER_URL + '?date=' + encodeURIComponent(from.toISOString());
-
-  try {
-    const res  = await fetch(url);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const entries = Array.isArray(json) ? json : (json.data || json.leaderboard || []);
-    setCache(entries);
-    render(entries);
-  } catch(err){
-    showError('FAILED TO LOAD DATA — ' + err.message);
-  }
+function load(){
+  // Sort manual data by wagered descending, take top 5
+  const entries = MANUAL_DATA.slice().sort((a,b) => b.wagered - a.wagered).slice(0,5);
+  render(entries);
 }
-
 load();
 </script>
 
